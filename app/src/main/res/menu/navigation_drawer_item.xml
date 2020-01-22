@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/gurd"
+        android:icon="@drawable/change_grd_vt"
+        android:title="Profile"/>
+
+    <item
+        android:id="@+id/resetpass"
+        android:icon="@drawable/password"
+        android:title="Change Password"/>
+
+    <item
+        android:id="@+id/settings"
+        android:icon="@drawable/setting_vt"
+        android:title="Settings"/>
+
+    <item
+        android:id="@+id/feedback"
+        android:icon="@drawable/feedback_vt"
+        android:title="Feedback"/>
+
+    <item
+        android:id="@+id/logout"
+        android:icon="@drawable/logout"
+        android:title="Logout" />
+
+</menu>
