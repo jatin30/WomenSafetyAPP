@@ -8,18 +8,18 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:979595083353:android:c981f88057623acf0d7b48",
+        "mobilesdk_app_id": "1:979595083353:android:329e4b606157de340d7b48",
         "android_client_info": {
           "package_name": "com.example.womensaftey"
         }
       },
       "oauth_client": [
         {
-          "client_id": "979595083353-u4t2chvo8me8ii41rhq0s1cl0h2vk8c1.apps.googleusercontent.com",
+          "client_id": "979595083353-03im4dhljkv6q63jpfcm2a21ctbvnt6j.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.example.womensaftey",
-            "certificate_hash": "2ed894d28b9a957f82f501022018f6befd6c6119"
+            "certificate_hash": "ce95e088b286b4314ffc88ef81c244615d92700e"
           }
         },
         {
@@ -29,7 +29,7 @@
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyA_xK042LHwkU1ch7PedlNGWsNNVue7rCo"
+          "current_key": "AIzaSyASk7nmmUh8xucMcknHwmZdzTm0Kbo7fVI"
         }
       ],
       "services": {

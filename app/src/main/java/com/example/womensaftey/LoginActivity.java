@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
 import android.util.Patterns;
 import android.view.View;
 import android.widget.Button;
@@ -43,36 +44,23 @@ public class LoginActivity extends AppCompatActivity {
 
         initViews();
         request();
-        sgntxt.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent=new Intent(LoginActivity.this,SignUp_Activity.class);
-                startActivity(intent);
-            }
-        });
-
-        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                swipeRefreshLayout.setRefreshing(false);
-            }
-        });
-
+        Log.e("MyTAgs","inside if");
+        mAuth = FirebaseAuth.getInstance();
         authStateListener=new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
                 FirebaseUser firebaseUser=mAuth.getCurrentUser();
                 if(firebaseUser!=null){
                     Toast.makeText(LoginActivity.this, "You are logged In Already!", Toast.LENGTH_SHORT).show();
-                    finish();
                     Intent intent=new Intent(LoginActivity.this,MainActivity.class);
                     intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     startActivity(intent);
+                    finish();
                 }
             }
         };
 
-        mAuth = FirebaseAuth.getInstance();
+
         lgnbtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -87,10 +75,10 @@ public class LoginActivity extends AppCompatActivity {
                             if (task.isSuccessful()) {
 
                                 swipeRefreshLayout.setRefreshing(false);
-                                finish();
                                 Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                                 startActivity(intent);
+                                finish();
 
                             } else {
                                 swipeRefreshLayout.setRefreshing(false);
@@ -109,7 +97,23 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
+        sgntxt.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent=new Intent(LoginActivity.this,SignUp_Activity.class);
+                startActivity(intent);
+            }
+        });
+
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                swipeRefreshLayout.setRefreshing(false);
+            }
+        });
+
     }
+
 
 
 
@@ -117,7 +121,7 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        mAuth.addAuthStateListener(authStateListener);
+//        mAuth.addAuthStateListener(authStateListener);
     }
 
     public boolean validate() {

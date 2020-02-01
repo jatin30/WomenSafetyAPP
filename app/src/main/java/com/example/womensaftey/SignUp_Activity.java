@@ -1,7 +1,7 @@
 package com.example.womensaftey;
 
-import android.content.Intent;
 import android.graphics.Color;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.util.Patterns;
@@ -14,11 +14,14 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthUserCollisionException;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 public class SignUp_Activity extends AppCompatActivity {
@@ -37,6 +40,7 @@ public class SignUp_Activity extends AppCompatActivity {
         setContentView(R.layout.signup_layout);
 
         initviews();
+        mAuth = FirebaseAuth.getInstance();
 
 
         signbtn.setOnClickListener(new View.OnClickListener() {
@@ -52,7 +56,6 @@ public class SignUp_Activity extends AppCompatActivity {
             }
         });
 
-        mAuth = FirebaseAuth.getInstance();
 
 
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -78,15 +81,9 @@ public class SignUp_Activity extends AppCompatActivity {
 
         signbtn.setEnabled(false);
 
-        final String name0 = name.getText().toString();
         String email0 = email.getText().toString();
         String password = paswd.getText().toString();
-        final String name1 = grdnam1.getText().toString().trim();
-        final String name2 = grdnam2.getText().toString().trim();
-        final String name3 = grdnam3.getText().toString().trim();
-        final String contact1 = grdcont1.getText().toString().trim();
-        final String contact2 = grdcont2.getText().toString().trim();
-        final String contact3 = grdcont3.getText().toString().trim();
+
 
         // TODO: Implement your own signup logic here.
 
@@ -95,9 +92,8 @@ public class SignUp_Activity extends AppCompatActivity {
             public void onComplete(@NonNull Task<AuthResult> task) {
 
                 if (task.isSuccessful()) {
-                    User user = new User(name0, name1, name2, name3, contact1, contact2, contact3);
-                    FirebaseDatabase.getInstance().getReference("User")
-                            .child(FirebaseAuth.getInstance().getCurrentUser().getUid()).setValue(user);
+                    BackTask backTask=new BackTask();
+                    backTask.execute();
                     onSignupSuccess();
                     Toast.makeText(getApplicationContext(), "You have registered successfully!!", Toast.LENGTH_SHORT).show();
                 }
@@ -108,7 +104,6 @@ public class SignUp_Activity extends AppCompatActivity {
                         Toast.makeText(getApplicationContext(), "You have already registered !!", Toast.LENGTH_SHORT).show();
 
                     } else {
-                        swipeRefreshLayout.setRefreshing(false);
                         onSignupFailed();
                     }
 
@@ -118,19 +113,82 @@ public class SignUp_Activity extends AppCompatActivity {
 
     }
 
+    public class BackTask extends AsyncTask<Void,Void,Void>{
+
+        private FusedLocationProviderClient fusedLocationClient;
+
+        private String Username;
+        private String gurdianName1;
+        private String gurdianName2;
+        private String gurdianName3;
+        private String gurdianContact1;
+        private String gurdianContact2;
+        private String gurdianContact3;
+        private LatLng latLng;
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+             Username = name.getText().toString();
+             gurdianName1 = grdnam1.getText().toString().trim();
+             gurdianName2= grdnam2.getText().toString().trim();
+             gurdianName3= grdnam3.getText().toString().trim();
+             gurdianContact1= grdcont1.getText().toString().trim();
+             gurdianContact2= grdcont2.getText().toString().trim();
+             gurdianContact3= grdcont3.getText().toString().trim();
+
+
+//            fusedLocationClient = LocationServices.getFusedLocationProviderClient(SignUp_Activity.this);
+//            fusedLocationClient.getLastLocation()
+//                    .addOnSuccessListener(SignUp_Activity.this, new OnSuccessListener<Location>() {
+//                        @Override
+//                        public void onSuccess(Location location) {
+//                            // Got last known location. In some rare situations this can be null.
+//                            if (location != null) {
+//                                latLng=new LatLng(location.getLatitude(),location.getLongitude());
+//                            }
+//                            else{
+//                                latLng=new LatLng(0,0);
+//                            }
+//                        }
+//                    });
+
+            latLng=new LatLng(0,0);
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+
+            User user = new User(Username,gurdianName1,
+                    gurdianName2,gurdianName3,gurdianContact1,
+                    gurdianContact2,gurdianContact3,latLng);
+
+            DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference("message");
+            mDatabase.child(FirebaseAuth.getInstance().getCurrentUser().getUid()).setValue(user);
+
+            //mRef.child(FirebaseAuth.getInstance().getCurrentUser().getUid()).setValue(user);
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+        }
+    }
+
 
     public void onSignupSuccess() {
         signbtn.setEnabled(true);
         swipeRefreshLayout.setRefreshing(false);
+//        Intent intent = new Intent(SignUp_Activity.this, MainActivity.class);
+//        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+//        startActivity(intent);
         finish();
-        Intent intent = new Intent(SignUp_Activity.this, MainActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        startActivity(intent);
     }
 
     public void onSignupFailed() {
         Toast.makeText(getBaseContext(), "SignUp Unsuccessful, Please Try Again!", Toast.LENGTH_LONG).show();
         signbtn.setEnabled(true);
+        swipeRefreshLayout.setRefreshing(false);
     }
 
     public boolean validate() {
