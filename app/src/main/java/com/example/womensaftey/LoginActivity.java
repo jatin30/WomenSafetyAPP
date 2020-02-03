@@ -1,10 +1,13 @@
 package com.example.womensaftey;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.util.Log;
 import android.util.Patterns;
@@ -29,7 +32,7 @@ import com.google.firebase.auth.FirebaseUser;
 
 public class LoginActivity extends AppCompatActivity {
 
-    private EditText lgneml,lgnpaswd;
+    private EditText lgneml, lgnpaswd;
     private Button lgnbtn;
     private TextView sgntxt;
 
@@ -43,85 +46,130 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.login_layout);
 
         initViews();
-        request();
-        Log.e("MyTAgs","inside if");
-        mAuth = FirebaseAuth.getInstance();
-        authStateListener=new FirebaseAuth.AuthStateListener() {
-            @Override
-            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                FirebaseUser firebaseUser=mAuth.getCurrentUser();
-                if(firebaseUser!=null){
-                    Toast.makeText(LoginActivity.this, "You are logged In Already!", Toast.LENGTH_SHORT).show();
-                    Intent intent=new Intent(LoginActivity.this,MainActivity.class);
-                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                    startActivity(intent);
-                    finish();
+
+        if (!isConnected(LoginActivity.this)) {
+            buildDialog(LoginActivity.this).show();
+        } else {
+            request();
+            Log.e("MyTAgs", "inside if");
+            mAuth = FirebaseAuth.getInstance();
+            authStateListener = new FirebaseAuth.AuthStateListener() {
+                @Override
+                public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                    FirebaseUser firebaseUser = mAuth.getCurrentUser();
+                    if (firebaseUser != null) {
+                        Toast.makeText(LoginActivity.this, "You are logged In Already!", Toast.LENGTH_SHORT).show();
+                        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                        startActivity(intent);
+                        finish();
+                    }
                 }
-            }
-        };
+            };
 
 
-        lgnbtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                swipeRefreshLayout.setColorSchemeColors(Color.BLUE, Color.YELLOW, Color.BLUE);
-                swipeRefreshLayout.setRefreshing(true);
-                if(validate()){
-                    String email = lgneml.getText().toString().trim();
-                    String password = lgnpaswd.getText().toString().trim();
-                    mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                        @Override
-                        public void onComplete(@NonNull Task<AuthResult> task) {
-                            if (task.isSuccessful()) {
+            lgnbtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    swipeRefreshLayout.setColorSchemeColors(Color.BLUE, Color.YELLOW, Color.BLUE);
+                    swipeRefreshLayout.setRefreshing(true);
+                    if (validate()) {
+                        String email = lgneml.getText().toString().trim();
+                        String password = lgnpaswd.getText().toString().trim();
+                        mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                            @Override
+                            public void onComplete(@NonNull Task<AuthResult> task) {
+                                if (task.isSuccessful()) {
 
-                                swipeRefreshLayout.setRefreshing(false);
-                                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                                startActivity(intent);
-                                finish();
+                                    swipeRefreshLayout.setRefreshing(false);
+                                    Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                    startActivity(intent);
+                                    finish();
 
-                            } else {
-                                swipeRefreshLayout.setRefreshing(false);
-                                Toast.makeText(LoginActivity.this, "There is no such user!", Toast.LENGTH_SHORT).show();
-                                Toast.makeText(getApplicationContext(), task.getException().getMessage(), Toast.LENGTH_LONG);
+                                } else {
+                                    swipeRefreshLayout.setRefreshing(false);
+                                    Toast.makeText(LoginActivity.this, "There is no such user!", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(getApplicationContext(), task.getException().getMessage(), Toast.LENGTH_LONG);
+                                }
                             }
-                        }
-                    });
+                        });
+                    } else {
+                        swipeRefreshLayout.setRefreshing(false);
+                        Toast.makeText(LoginActivity.this, "Validate not successful", Toast.LENGTH_SHORT).show();
+                    }
+
+
                 }
-                else{
+            });
+
+            sgntxt.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent intent = new Intent(LoginActivity.this, SignUp_Activity.class);
+                    startActivity(intent);
+                }
+            });
+
+            swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+                @Override
+                public void onRefresh() {
                     swipeRefreshLayout.setRefreshing(false);
-                    Toast.makeText(LoginActivity.this, "Validate not successful", Toast.LENGTH_SHORT).show();
                 }
+            });
+        }
 
-
-            }
-        });
-
-        sgntxt.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent=new Intent(LoginActivity.this,SignUp_Activity.class);
-                startActivity(intent);
-            }
-        });
-
-        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                swipeRefreshLayout.setRefreshing(false);
-            }
-        });
 
     }
 
 
+    public boolean isConnected(Context context) {
 
+        ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo netinfo = cm.getActiveNetworkInfo();
+
+        if (netinfo != null && netinfo.isConnectedOrConnecting()) {
+            NetworkInfo wifi = cm.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+            NetworkInfo mobile = cm.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
+
+            if ((mobile != null && mobile.isConnectedOrConnecting()) || (wifi != null && wifi.isConnectedOrConnecting()))
+                return true;
+            else return false;
+        } else
+            return false;
+    }
+
+    public AlertDialog.Builder buildDialog(Context c) {
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(c);
+        builder.setTitle("No Internet Connection");
+        builder.setMessage("You need to have Mobile Data or wifi to access this. Press ok to Exit");
+
+        builder.setPositiveButton("Retry", new DialogInterface.OnClickListener() {
+
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                if (!isConnected(LoginActivity.this)) {
+                    buildDialog(LoginActivity.this).show();
+                }
+            }
+        });
+
+        builder.setNegativeButton("Close App", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                finish();
+            }
+        });
+
+        return builder;
+    }
 
 
     @Override
     protected void onStart() {
         super.onStart();
-//        mAuth.addAuthStateListener(authStateListener);
+        mAuth.addAuthStateListener(authStateListener);
     }
 
     public boolean validate() {
@@ -148,89 +196,78 @@ public class LoginActivity extends AppCompatActivity {
         return valid;
     }
 
-    public void request()
-    {
-        if(ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS)!= PackageManager.PERMISSION_GRANTED)
-        {
-            ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.SEND_SMS},0);
+    public void request() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.SEND_SMS) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.SEND_SMS}, 0);
         }
-        if(ContextCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE)!= PackageManager.PERMISSION_GRANTED)
-        {
-            ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.READ_PHONE_STATE},2);
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_PHONE_STATE}, 2);
         }
-        if(ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)!= PackageManager.PERMISSION_GRANTED)
-        {
-            ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.ACCESS_FINE_LOCATION},1);
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
         }
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        switch (requestCode)
-        {
+        switch (requestCode) {
             case 0:
-                if(grantResults[0]==PackageManager.PERMISSION_GRANTED){
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     Toast.makeText(this, "Thanks! Permission Granted", Toast.LENGTH_SHORT).show();
-                }
-                else if(grantResults[0]==PackageManager.PERMISSION_DENIED){
-                    if(ActivityCompat.shouldShowRequestPermissionRationale(LoginActivity.this,Manifest.permission.SEND_SMS)){
-                        AlertDialog.Builder dialog=new AlertDialog.Builder(this);
+                } else if (grantResults[0] == PackageManager.PERMISSION_DENIED) {
+                    if (ActivityCompat.shouldShowRequestPermissionRationale(LoginActivity.this, Manifest.permission.SEND_SMS)) {
+                        AlertDialog.Builder dialog = new AlertDialog.Builder(this);
                         dialog.setMessage("This Permission is important, Please permit it!")
                                 .setTitle("Important permission Denied!");
 
                         dialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
-                                ActivityCompat.requestPermissions(LoginActivity.this,new String[]{Manifest.permission.SEND_SMS},0);
+                                ActivityCompat.requestPermissions(LoginActivity.this, new String[]{Manifest.permission.SEND_SMS}, 0);
                             }
                         });
                     }
-                }
-                else{
+                } else {
                     Toast.makeText(this, "We will never show this to you again", Toast.LENGTH_SHORT).show();
                 }
 
             case 1:
-                if(grantResults[0]==PackageManager.PERMISSION_GRANTED){
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     Toast.makeText(this, "Thanks! Permission Granted", Toast.LENGTH_SHORT).show();
-                }
-                else if(grantResults[0]==PackageManager.PERMISSION_DENIED){
-                    if(ActivityCompat.shouldShowRequestPermissionRationale(LoginActivity.this,Manifest.permission.ACCESS_FINE_LOCATION)){
-                        AlertDialog.Builder dialog=new AlertDialog.Builder(this);
+                } else if (grantResults[0] == PackageManager.PERMISSION_DENIED) {
+                    if (ActivityCompat.shouldShowRequestPermissionRationale(LoginActivity.this, Manifest.permission.ACCESS_FINE_LOCATION)) {
+                        AlertDialog.Builder dialog = new AlertDialog.Builder(this);
                         dialog.setMessage("This Permission is important, Please permit it!")
                                 .setTitle("Important permission Denied!");
 
                         dialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
-                                ActivityCompat.requestPermissions(LoginActivity.this,new String[]{Manifest.permission.ACCESS_FINE_LOCATION},1);
+                                ActivityCompat.requestPermissions(LoginActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
                             }
                         });
                     }
-                }
-                else{
+                } else {
                     Toast.makeText(this, "We will never show this to you again", Toast.LENGTH_SHORT).show();
                 }
 
             case 2:
-                if(grantResults[0]==PackageManager.PERMISSION_GRANTED){
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     Toast.makeText(this, "Thanks! Permission Granted", Toast.LENGTH_SHORT).show();
-                }
-                else if(grantResults[0]==PackageManager.PERMISSION_DENIED){
-                    if(ActivityCompat.shouldShowRequestPermissionRationale(LoginActivity.this,Manifest.permission.READ_PHONE_STATE)){
-                        AlertDialog.Builder dialog=new AlertDialog.Builder(this);
+                } else if (grantResults[0] == PackageManager.PERMISSION_DENIED) {
+                    if (ActivityCompat.shouldShowRequestPermissionRationale(LoginActivity.this, Manifest.permission.READ_PHONE_STATE)) {
+                        AlertDialog.Builder dialog = new AlertDialog.Builder(this);
                         dialog.setMessage("This Permission is important, Please permit it!")
                                 .setTitle("Important permission Denied!");
 
                         dialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
-                                ActivityCompat.requestPermissions(LoginActivity.this,new String[]{Manifest.permission.READ_PHONE_STATE},2);
+                                ActivityCompat.requestPermissions(LoginActivity.this, new String[]{Manifest.permission.READ_PHONE_STATE}, 2);
                             }
                         });
                     }
-                }
-                else{
+                } else {
                     //We can show here snakebar also
                     Toast.makeText(this, "We will never show this to you again", Toast.LENGTH_SHORT).show();
                 }
@@ -238,11 +275,11 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
-    public void initViews(){
-        lgnbtn=findViewById(R.id.lgnbtn);
-        lgneml=findViewById(R.id.lgneml);
-        lgnpaswd=findViewById(R.id.lgnpaswd);
-        sgntxt=findViewById(R.id.sgntxt);
-        swipeRefreshLayout=findViewById(R.id.swip);
+    public void initViews() {
+        lgnbtn = findViewById(R.id.lgnbtn);
+        lgneml = findViewById(R.id.lgneml);
+        lgnpaswd = findViewById(R.id.lgnpaswd);
+        sgntxt = findViewById(R.id.sgntxt);
+        swipeRefreshLayout = findViewById(R.id.swip);
     }
 }

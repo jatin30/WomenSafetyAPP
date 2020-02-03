@@ -1,6 +1,7 @@
 package com.example.womensaftey;
 
 import android.graphics.Color;
+import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -15,8 +16,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
@@ -27,6 +30,9 @@ import com.google.firebase.database.FirebaseDatabase;
 public class SignUp_Activity extends AppCompatActivity {
 
     private static final String TAG = "SignUp_Activity";
+
+    public FusedLocationProviderClient fusedLocationClient;
+    static public LatLng latLng;
 
     private EditText email, paswd, name, grdnam1, grdnam2, grdnam3, grdcont1, grdcont2, grdcont3;
     private Button signbtn,lgnbtn;
@@ -66,6 +72,20 @@ public class SignUp_Activity extends AppCompatActivity {
         });
 
 
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(SignUp_Activity.this);
+        fusedLocationClient.getLastLocation()
+                .addOnSuccessListener(SignUp_Activity.this, new OnSuccessListener<Location>() {
+                    @Override
+                    public void onSuccess(Location location) {
+                        // Got last known location. In some rare situations this can be null.
+                        if (location != null) {
+                            latLng=new LatLng(location.getLatitude(),location.getLongitude());
+                        }
+                        else{
+                            latLng=new LatLng(0,0);
+                        }
+                    }
+                });
     }
 
 
@@ -125,6 +145,8 @@ public class SignUp_Activity extends AppCompatActivity {
         private String gurdianContact2;
         private String gurdianContact3;
         private LatLng latLng;
+
+
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
@@ -135,24 +157,8 @@ public class SignUp_Activity extends AppCompatActivity {
              gurdianContact1= grdcont1.getText().toString().trim();
              gurdianContact2= grdcont2.getText().toString().trim();
              gurdianContact3= grdcont3.getText().toString().trim();
+             latLng=SignUp_Activity.latLng;
 
-
-//            fusedLocationClient = LocationServices.getFusedLocationProviderClient(SignUp_Activity.this);
-//            fusedLocationClient.getLastLocation()
-//                    .addOnSuccessListener(SignUp_Activity.this, new OnSuccessListener<Location>() {
-//                        @Override
-//                        public void onSuccess(Location location) {
-//                            // Got last known location. In some rare situations this can be null.
-//                            if (location != null) {
-//                                latLng=new LatLng(location.getLatitude(),location.getLongitude());
-//                            }
-//                            else{
-//                                latLng=new LatLng(0,0);
-//                            }
-//                        }
-//                    });
-
-            latLng=new LatLng(0,0);
         }
 
         @Override
@@ -160,7 +166,7 @@ public class SignUp_Activity extends AppCompatActivity {
 
             User user = new User(Username,gurdianName1,
                     gurdianName2,gurdianName3,gurdianContact1,
-                    gurdianContact2,gurdianContact3,latLng);
+                    gurdianContact2,gurdianContact3,latLng,false);
 
             DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference("message");
             mDatabase.child(FirebaseAuth.getInstance().getCurrentUser().getUid()).setValue(user);

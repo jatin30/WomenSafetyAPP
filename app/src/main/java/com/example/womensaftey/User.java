@@ -11,9 +11,10 @@ public class User {
     public String gurdianContact2;
     public String gurdianContact3;
     public LatLng latLng;
+    public Boolean canCheck;
 
 
-    public User(String username, String gurdianName1, String gurdianName2, String gurdianName3, String gurdianContact1, String gurdianContact2, String gurdianContact3, LatLng latLng) {
+    public User(String username, String gurdianName1, String gurdianName2, String gurdianName3, String gurdianContact1, String gurdianContact2, String gurdianContact3, LatLng latLng, Boolean canCheck) {
         Username = username;
         this.gurdianName1 = gurdianName1;
         this.gurdianName2 = gurdianName2;
@@ -22,6 +23,7 @@ public class User {
         this.gurdianContact2 = gurdianContact2;
         this.gurdianContact3 = gurdianContact3;
         this.latLng = latLng;
+        this.canCheck = canCheck;
     }
 
     public User(){}

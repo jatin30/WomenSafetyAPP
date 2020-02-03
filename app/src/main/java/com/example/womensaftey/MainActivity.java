@@ -38,7 +38,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         navigationView.setNavigationItemSelectedListener(this);
 
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-        Home_frag frag = new Home_frag();
+        Home_frag frag = new Home_frag(MainActivity.this);
         fragmentTransaction.replace(R.id.fragment_container, frag);
         fragmentTransaction.commit();
 
@@ -50,13 +50,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 switch (menuItem.getItemId()) {
                     case R.id.homes:
                         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-                        Home_frag frag = new Home_frag();
+                        Home_frag frag = new Home_frag(MainActivity.this);
                         fragmentTransaction.replace(R.id.fragment_container, frag);
                         fragmentTransaction.commit();
                         break;
                     case R.id.maps:
                         FragmentTransaction fragmentTransaction1 = getSupportFragmentManager().beginTransaction();
-                        Maps_frag frag1 = new Maps_frag();
+                        Maps_frag frag1 = new Maps_frag(MainActivity.this);
                         fragmentTransaction1.replace(R.id.fragment_container, frag1);
                         fragmentTransaction1.commit();
                         break;

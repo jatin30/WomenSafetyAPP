@@ -24,4 +24,21 @@
         android:textStyle="bold"
         android:visibility="invisible" />
 
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <Button
+            android:id="@+id/btncncl"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_gravity="bottom"
+            android:layout_marginBottom="70dp"
+            android:background="#1AD1D6"
+            android:text="Stop Sending location"
+            android:textColor="#FF3D00" />
+    </RelativeLayout>
+
+
 </LinearLayout>
