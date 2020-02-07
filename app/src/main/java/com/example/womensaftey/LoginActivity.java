@@ -39,86 +39,99 @@ public class LoginActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener authStateListener;
     private SwipeRefreshLayout swipeRefreshLayout;
+    private String TAG="Authentication part  :";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.login_layout);
+        mAuth = FirebaseAuth.getInstance();
 
         initViews();
 
-        if (!isConnected(LoginActivity.this)) {
-            buildDialog(LoginActivity.this).show();
-        } else {
-            request();
-            Log.e("MyTAgs", "inside if");
-            mAuth = FirebaseAuth.getInstance();
-            authStateListener = new FirebaseAuth.AuthStateListener() {
-                @Override
-                public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                    FirebaseUser firebaseUser = mAuth.getCurrentUser();
-                    if (firebaseUser != null) {
-                        Toast.makeText(LoginActivity.this, "You are logged In Already!", Toast.LENGTH_SHORT).show();
-                        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                        startActivity(intent);
-                        finish();
-                    }
-                }
-            };
 
-
-            lgnbtn.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    swipeRefreshLayout.setColorSchemeColors(Color.BLUE, Color.YELLOW, Color.BLUE);
-                    swipeRefreshLayout.setRefreshing(true);
-                    if (validate()) {
-                        String email = lgneml.getText().toString().trim();
-                        String password = lgnpaswd.getText().toString().trim();
-                        mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                            @Override
-                            public void onComplete(@NonNull Task<AuthResult> task) {
-                                if (task.isSuccessful()) {
-
-                                    swipeRefreshLayout.setRefreshing(false);
-                                    Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                                    startActivity(intent);
-                                    finish();
-
-                                } else {
-                                    swipeRefreshLayout.setRefreshing(false);
-                                    Toast.makeText(LoginActivity.this, "There is no such user!", Toast.LENGTH_SHORT).show();
-                                    Toast.makeText(getApplicationContext(), task.getException().getMessage(), Toast.LENGTH_LONG);
-                                }
-                            }
-                        });
-                    } else {
-                        swipeRefreshLayout.setRefreshing(false);
-                        Toast.makeText(LoginActivity.this, "Validate not successful", Toast.LENGTH_SHORT).show();
-                    }
-
-
-                }
-            });
-
-            sgntxt.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    Intent intent = new Intent(LoginActivity.this, SignUp_Activity.class);
-                    startActivity(intent);
-                }
-            });
-
-            swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-                @Override
-                public void onRefresh() {
-                    swipeRefreshLayout.setRefreshing(false);
-                }
-            });
+        if (!isConnected(this)) {
+            buildDialog(this).show();
         }
 
+        else{
+            AuthenticationCheck();
+        }
+
+        request();
+        Log.e("MyTAgs", "inside if");
+
+        lgnbtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                swipeRefreshLayout.setColorSchemeColors(Color.BLUE, Color.YELLOW, Color.BLUE);
+                swipeRefreshLayout.setRefreshing(true);
+                if (validate()) {
+                    String email = lgneml.getText().toString().trim();
+                    String password = lgnpaswd.getText().toString().trim();
+                    mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                        @Override
+                        public void onComplete(@NonNull Task<AuthResult> task) {
+                            if (task.isSuccessful()) {
+
+                                swipeRefreshLayout.setRefreshing(false);
+                                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                startActivity(intent);
+                                finish();
+
+                            } else {
+                                swipeRefreshLayout.setRefreshing(false);
+                                Toast.makeText(LoginActivity.this, "There is no such user!", Toast.LENGTH_SHORT).show();
+
+                                Log.d(TAG, "onComplete: " + task.getException().getMessage());
+                            }
+                        }
+                    });
+                } else {
+                    swipeRefreshLayout.setRefreshing(false);
+                    Toast.makeText(LoginActivity.this, "Validate not successful", Toast.LENGTH_SHORT).show();
+                }
+
+
+            }
+        });
+
+        sgntxt.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(LoginActivity.this, SignUp_Activity.class);
+                startActivity(intent);
+            }
+        });
+
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                swipeRefreshLayout.setRefreshing(false);
+            }
+        });
+
+
+    }
+
+
+    public void AuthenticationCheck() {
+
+        authStateListener = new FirebaseAuth.AuthStateListener() {
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                FirebaseUser firebaseUser = mAuth.getCurrentUser();
+                if (firebaseUser != null) {
+                    Toast.makeText(LoginActivity.this, "You are logged In Already!", Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    startActivity(intent);
+                    finish();
+                }
+            }
+        };
+        mAuth.addAuthStateListener(authStateListener);
 
     }
 
@@ -143,34 +156,39 @@ public class LoginActivity extends AppCompatActivity {
 
         AlertDialog.Builder builder = new AlertDialog.Builder(c);
         builder.setTitle("No Internet Connection");
-        builder.setMessage("You need to have Mobile Data or wifi to access this. Press ok to Exit");
-
+        builder.setMessage("You need to have Mobile Data or wifi to access this. Please enable internet connection");
         builder.setPositiveButton("Retry", new DialogInterface.OnClickListener() {
 
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 if (!isConnected(LoginActivity.this)) {
                     buildDialog(LoginActivity.this).show();
+                } else {
+                    AuthenticationCheck();
+                    request();
                 }
             }
         });
-
         builder.setNegativeButton("Close App", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 finish();
             }
         });
-
+        builder.setCancelable(false);
         return builder;
     }
 
+//    @Override
+//    public boolean dispatchTouchEvent(MotionEvent ev) {
+//        if (getCurrentFocus() != null) {
+//            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+//            imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+//        }
+//        return super.dispatchTouchEvent(ev);
+//    }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-        mAuth.addAuthStateListener(authStateListener);
-    }
+
 
     public boolean validate() {
         boolean valid = true;
@@ -230,6 +248,7 @@ public class LoginActivity extends AppCompatActivity {
                 } else {
                     Toast.makeText(this, "We will never show this to you again", Toast.LENGTH_SHORT).show();
                 }
+                break;
 
             case 1:
                 if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
@@ -250,6 +269,7 @@ public class LoginActivity extends AppCompatActivity {
                 } else {
                     Toast.makeText(this, "We will never show this to you again", Toast.LENGTH_SHORT).show();
                 }
+                break;
 
             case 2:
                 if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
@@ -271,6 +291,7 @@ public class LoginActivity extends AppCompatActivity {
                     //We can show here snakebar also
                     Toast.makeText(this, "We will never show this to you again", Toast.LENGTH_SHORT).show();
                 }
+                break;
 
         }
     }

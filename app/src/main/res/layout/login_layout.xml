@@ -2,79 +2,115 @@
 <androidx.swiperefreshlayout.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/swip"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FF5000"
-    tools:context=".LoginActivity"
-    android:id="@+id/swip"
+    android:background="#B3FFA43F"
     android:outlineSpotShadowColor="@color/colorPrimaryDark"
-    >
+    android:padding="10dp"
+    tools:context=".LoginActivity">
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="30dp"
+            android:layout_weight="2.5"
+            android:scaleType="centerInside"
+            android:src="@drawable/icon" />
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_gravity="center|center_horizontal"
             android:layout_marginStart="20dp"
             android:layout_marginEnd="20dp"
-            android:background="#E7DCDC"
+            android:layout_weight="1"
             android:orientation="vertical">
-
-
-            <TextView
-                android:id="@+id/textView5"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="30dp"
-                android:gravity="center"
-                android:text="Login"
-                android:textColor="#581313"
-                android:textSize="30sp"
-                android:textStyle="bold" />
 
             <EditText
                 android:id="@+id/lgneml"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="30dp"
-                android:layout_marginTop="20dp"
-                android:layout_marginEnd="30dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginTop="70dp"
+                android:layout_marginRight="10dp"
+                android:layout_marginBottom="10dp"
+                android:background="@drawable/shapeemail"
+                android:drawablePadding="10dp"
                 android:ems="10"
                 android:hint="Email"
-                android:inputType="textEmailAddress" />
+                android:inputType="textEmailAddress"
+                android:padding="15dp"
+                android:textColor="#6F0707"
+                android:textColorHighlight="@color/white"
+                android:textColorHint="#640202" />
 
             <EditText
                 android:id="@+id/lgnpaswd"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="30dp"
-                android:layout_marginTop="20dp"
-                android:layout_marginEnd="30dp"
+                android:layout_margin="10dp"
+                android:background="@drawable/shapeemail"
+                android:drawablePadding="10dp"
                 android:ems="10"
-                android:hint="Passwaord"
-                android:inputType="textPassword" />
+                android:hint="Password"
+                android:inputType="textPassword"
+                android:padding="15dp"
+                android:textColor="#6F0707"
+                android:textColorHighlight="@color/white"
+                android:textColorHint="#640202" />
+
 
             <Button
                 android:id="@+id/lgnbtn"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="70dp"
-                android:background="#2E0FB6"
-                android:text="Login"
-                android:textColor="#FFFFFF" />
+                android:layout_marginLeft="10dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginRight="10dp"
+                android:layout_marginBottom="10dp"
+                android:background="@drawable/shapesignup"
+                android:padding="15dp"
+                android:shadowColor="@android:color/transparent"
+                android:text="Log In" />
 
-            <TextView
+
+            <!--            <RelativeLayout-->
+            <!--                android:layout_width="match_parent"-->
+            <!--                android:layout_height="wrap_content">-->
+            <!--            <LinearLayout-->
+            <!--                android:layout_width="match_parent"-->
+            <!--                android:layout_height="wrap_content"-->
+            <!--                android:orientation="vertical"-->
+            <!--                android:layout_marginTop="70dp"-->
+            <!--                android:layout_alignParentBottom="true">-->
+
+            <Button
                 android:id="@+id/sgntxt"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center"
-                android:text="SignUp"
-                android:textColor="#AF0B0B"
-                android:textSize="18sp" />
+                android:layout_marginLeft="10dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginRight="10dp"
+                android:layout_marginBottom="10dp"
+                android:background="@android:color/transparent"
+                android:padding="15dp"
+                android:shadowColor="@android:color/transparent"
+                android:text="No account yet? Create one"
+                android:textAllCaps="false"
+                android:textColor="#AF0000" />
+            <!--            </LinearLayout>-->
+            <!--            </RelativeLayout>-->
+
         </LinearLayout>
+
+
     </LinearLayout>
 
 

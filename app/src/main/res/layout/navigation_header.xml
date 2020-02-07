@@ -34,7 +34,7 @@
                 android:orientation="vertical">
 
                 <TextView
-                    android:id="@+id/textView"
+                    android:id="@+id/navuser"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="TextView"
@@ -42,7 +42,7 @@
                     android:textSize="14sp" />
 
                 <TextView
-                    android:id="@+id/textView2"
+                    android:id="@+id/navemail"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="TextView"

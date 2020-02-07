@@ -116,6 +116,7 @@ class Maps_frag3 extends Fragment implements OnMapReadyCallback {
 
 
     private class LocationListener implements android.location.LocationListener {
+
         Location mLastLocation;
 
         public LocationListener(String provider) {
