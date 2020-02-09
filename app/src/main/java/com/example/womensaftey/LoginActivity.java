@@ -11,7 +11,9 @@ import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.util.Log;
 import android.util.Patterns;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -42,13 +44,8 @@ public class LoginActivity extends AppCompatActivity {
     private String TAG="Authentication part  :";
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.login_layout);
-        mAuth = FirebaseAuth.getInstance();
-
-        initViews();
-
+    protected void onStart() {
+        super.onStart();
 
         if (!isConnected(this)) {
             buildDialog(this).show();
@@ -57,6 +54,17 @@ public class LoginActivity extends AppCompatActivity {
         else{
             AuthenticationCheck();
         }
+
+    }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.login_layout);
+        mAuth = FirebaseAuth.getInstance();
+
+        initViews();
+
 
         request();
         Log.e("MyTAgs", "inside if");
@@ -73,7 +81,6 @@ public class LoginActivity extends AppCompatActivity {
                         @Override
                         public void onComplete(@NonNull Task<AuthResult> task) {
                             if (task.isSuccessful()) {
-
                                 swipeRefreshLayout.setRefreshing(false);
                                 Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -82,8 +89,7 @@ public class LoginActivity extends AppCompatActivity {
 
                             } else {
                                 swipeRefreshLayout.setRefreshing(false);
-                                Toast.makeText(LoginActivity.this, "There is no such user!", Toast.LENGTH_SHORT).show();
-
+                                Toast.makeText(LoginActivity.this, "Please check your details"+ task.getException().getLocalizedMessage(), Toast.LENGTH_LONG).show();
                                 Log.d(TAG, "onComplete: " + task.getException().getMessage());
                             }
                         }
@@ -179,14 +185,14 @@ public class LoginActivity extends AppCompatActivity {
         return builder;
     }
 
-//    @Override
-//    public boolean dispatchTouchEvent(MotionEvent ev) {
-//        if (getCurrentFocus() != null) {
-//            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-//            imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
-//        }
-//        return super.dispatchTouchEvent(ev);
-//    }
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent ev) {
+        if (getCurrentFocus() != null) {
+            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+        }
+        return super.dispatchTouchEvent(ev);
+    }
 
 
 
@@ -230,9 +236,10 @@ public class LoginActivity extends AppCompatActivity {
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         switch (requestCode) {
             case 0:
-                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                if (grantResults.length>0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     Toast.makeText(this, "Thanks! Permission Granted", Toast.LENGTH_SHORT).show();
-                } else if (grantResults[0] == PackageManager.PERMISSION_DENIED) {
+                    request();
+                } else if (grantResults.length>0 && grantResults[0] == PackageManager.PERMISSION_DENIED) {
                     if (ActivityCompat.shouldShowRequestPermissionRationale(LoginActivity.this, Manifest.permission.SEND_SMS)) {
                         AlertDialog.Builder dialog = new AlertDialog.Builder(this);
                         dialog.setMessage("This Permission is important, Please permit it!")
@@ -251,9 +258,10 @@ public class LoginActivity extends AppCompatActivity {
                 break;
 
             case 1:
-                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                if (grantResults.length>0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     Toast.makeText(this, "Thanks! Permission Granted", Toast.LENGTH_SHORT).show();
-                } else if (grantResults[0] == PackageManager.PERMISSION_DENIED) {
+                    request();
+                } else if (grantResults.length>0 && grantResults[0] == PackageManager.PERMISSION_DENIED) {
                     if (ActivityCompat.shouldShowRequestPermissionRationale(LoginActivity.this, Manifest.permission.ACCESS_FINE_LOCATION)) {
                         AlertDialog.Builder dialog = new AlertDialog.Builder(this);
                         dialog.setMessage("This Permission is important, Please permit it!")
@@ -272,9 +280,10 @@ public class LoginActivity extends AppCompatActivity {
                 break;
 
             case 2:
-                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                if (grantResults.length>0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     Toast.makeText(this, "Thanks! Permission Granted", Toast.LENGTH_SHORT).show();
-                } else if (grantResults[0] == PackageManager.PERMISSION_DENIED) {
+                    request();
+                } else if (grantResults.length>0 && grantResults[0] == PackageManager.PERMISSION_DENIED) {
                     if (ActivityCompat.shouldShowRequestPermissionRationale(LoginActivity.this, Manifest.permission.READ_PHONE_STATE)) {
                         AlertDialog.Builder dialog = new AlertDialog.Builder(this);
                         dialog.setMessage("This Permission is important, Please permit it!")

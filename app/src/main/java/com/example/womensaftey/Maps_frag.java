@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
@@ -34,8 +35,8 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -54,7 +55,10 @@ public class Maps_frag extends Fragment implements OnMapReadyCallback {
     private FusedLocationProviderClient fusedLocationClient;
     LocationRequest locationRequest;
 
-    String userID=null;
+    FloatingActionButton fab;
+
+    String userID = null;
+    public static final String MY_PREFS_FILENAME = "com.example.womensaftey.myfile";
 
     Maps_frag(Context context) {
         this.context = context;
@@ -79,6 +83,45 @@ public class Maps_frag extends Fragment implements OnMapReadyCallback {
 
 
     @Override
+    public void onStart() {
+        super.onStart();
+
+        if(userID==null){
+            SharedPreferences preferences = context.getSharedPreferences(MY_PREFS_FILENAME, Context.MODE_PRIVATE);
+            userID = preferences.getString("uid", null);
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        if (userID != null) {
+            final FirebaseDatabase database = FirebaseDatabase.getInstance();
+            DatabaseReference mref = database.getReference("message");
+            mref.child(userID).child("canCheck").addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    Boolean canCheck = dataSnapshot.getValue(Boolean.class);
+                    if (canCheck == false) {
+                        userID = null;
+                        SharedPreferences.Editor editor = context.
+                                getSharedPreferences(MY_PREFS_FILENAME, Context.MODE_PRIVATE).edit();
+                        editor.putString("uid", userID);
+                        editor.commit();
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+                    userID = null;
+                }
+            });
+        }
+    }
+
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
@@ -86,7 +129,7 @@ public class Maps_frag extends Fragment implements OnMapReadyCallback {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.maps_frag_layout, container, false);
 
-
+        fab = view.findViewById(R.id.fab);
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(context);
         createLocationRequest();
 
@@ -126,6 +169,15 @@ public class Maps_frag extends Fragment implements OnMapReadyCallback {
 
 
     @Override
+    public void onPause() {
+        super.onPause();
+        SharedPreferences.Editor editor = context.
+                getSharedPreferences(MY_PREFS_FILENAME, Context.MODE_PRIVATE).edit();
+        editor.putString("uid", userID);
+        editor.commit();
+    }
+
+    @Override
     public void onDestroyView() {
         super.onDestroyView();
         fusedLocationClient.removeLocationUpdates(locationCallback);
@@ -139,41 +191,77 @@ public class Maps_frag extends Fragment implements OnMapReadyCallback {
         //mMap.getUiSettings().setZoomControlsEnabled(true);
         mMap.getUiSettings().setZoomGesturesEnabled(true);
         mMap.getUiSettings().setMapToolbarEnabled(true);
+        mMap.getUiSettings().setMyLocationButtonEnabled(false);
 
 
         //mMap.addMarker(new MarkerOptions().position(userlocation[0]).title("Your Location").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE)));
         //mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userlocation[0],15));
 
-        //mMap.getUiSettings().setMyLocationButtonEnabled(false);
+
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(userlocation[0], 10));
 
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(userlocation[0], 15));
+            }
+        });
+
         if (userID != null) {
-            final LatLng[] destination = new LatLng[1];
-            final FirebaseDatabase database=FirebaseDatabase.getInstance();
-            DatabaseReference mref=database.getReference("message");
-            mref.child(userID).child("latLng").addValueEventListener(new ValueEventListener() {
+            final FirebaseDatabase database = FirebaseDatabase.getInstance();
+            final DatabaseReference mref = database.getReference("message");
+
+
+            mref.child(userID).child("canCheck").addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    destination[0] = dataSnapshot.getValue(LatLng.class);
-                    Log.d(TAG, "onDataChange: UserID:"+userID+"  \n"+destination[0].latitude +"  "+destination[0].longitude);
+                    Boolean canCheck = dataSnapshot.getValue(Boolean.class);
+                    if (canCheck == false) {
+                        userID = null;
+                        mMap.clear();
+                        SharedPreferences.Editor editor = context.
+                                getSharedPreferences(MY_PREFS_FILENAME, Context.MODE_PRIVATE).edit();
+                        editor.putString("uid", userID);
+                        editor.commit();
+
+                    } else {
+
+                        mref.child(userID).child("latLng").addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                if (dataSnapshot != null) {
+                                    LatLng destination = new LatLng(dataSnapshot.child("latitude").getValue(Double.class), dataSnapshot.child("longitude").getValue(Double.class));
+                                    mMap.clear();
+                                    mMap.addMarker(new MarkerOptions().position(destination).title("Your Location").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE)));
+
+//                                    new GetPathFromLocation(userlocation[0], destination, new DirectionPointListener() {
+//                                        @Override
+//                                        public void onPath(PolylineOptions polyLine) {
+//                                            mMap.addPolyline(polyLine);
+//                                        }
+//                                    }).execute();
+
+                                    Log.d(TAG, "onDataChange: UserID:" + userID + "  \n" + destination.latitude + "  " + destination.longitude);
+                                } else {
+                                    Log.d(TAG, "onDataChange: datasnapshot is null");
+                                }
+
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                            }
+                        });
+                    }
                 }
 
                 @Override
                 public void onCancelled(@NonNull DatabaseError databaseError) {
-
+                    userID = null;
                 }
             });
-
-            mMap.addMarker(new MarkerOptions().position(destination[0]).title("Your Location").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE)));
-            new GetPathFromLocation(userlocation[0], destination[0], new DirectionPointListener() {
-                @Override
-                public void onPath(PolylineOptions polyLine) {
-                    mMap.addPolyline(polyLine);
-                }
-            }).execute();
         }
-
-
     }
 
 
@@ -188,9 +276,9 @@ public class Maps_frag extends Fragment implements OnMapReadyCallback {
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         switch (requestCode) {
             case 0:
-                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     Toast.makeText(context, "Thanks! Permission Granted", Toast.LENGTH_SHORT).show();
-                } else if (grantResults[0] == PackageManager.PERMISSION_DENIED) {
+                } else if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_DENIED) {
                     if (ActivityCompat.shouldShowRequestPermissionRationale((Activity) context, Manifest.permission.ACCESS_FINE_LOCATION)) {
                         AlertDialog.Builder dialog = new AlertDialog.Builder(context);
                         dialog.setMessage("This Permission is important, Please permit it!")

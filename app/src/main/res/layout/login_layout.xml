@@ -2,27 +2,27 @@
 <androidx.swiperefreshlayout.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/swip"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#B3FFA43F"
-    android:outlineSpotShadowColor="@color/colorPrimaryDark"
+    android:background="@drawable/gradientbackground"
+    tools:context=".LoginActivity"
+    android:id="@+id/swip"
     android:padding="10dp"
-    tools:context=".LoginActivity">
+    android:outlineSpotShadowColor="@color/colorPrimary"
+    >
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:gravity="center"
         android:orientation="vertical">
-
         <ImageView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginTop="30dp"
-            android:layout_weight="2.5"
+            android:src="@drawable/icon"
             android:scaleType="centerInside"
-            android:src="@drawable/icon" />
+            android:layout_weight="2.5"
+            android:layout_marginTop="30dp"/>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -45,11 +45,14 @@
                 android:drawablePadding="10dp"
                 android:ems="10"
                 android:hint="Email"
+
                 android:inputType="textEmailAddress"
                 android:padding="15dp"
-                android:textColor="#6F0707"
-                android:textColorHighlight="@color/white"
-                android:textColorHint="#640202" />
+                android:textColor="#FFF6F6"
+                android:textColorHighlight="#000000"
+                android:textColorHint="#000000"
+                android:textStyle="" />
+            <!--android:drawableStart="@drawable/ic_person_white_24dp"-->
 
             <EditText
                 android:id="@+id/lgnpaswd"
@@ -58,27 +61,28 @@
                 android:layout_margin="10dp"
                 android:background="@drawable/shapeemail"
                 android:drawablePadding="10dp"
+
                 android:ems="10"
                 android:hint="Password"
                 android:inputType="textPassword"
                 android:padding="15dp"
-                android:textColor="#6F0707"
+                android:textColor="#FFF6F6"
                 android:textColorHighlight="@color/white"
-                android:textColorHint="#640202" />
-
+                android:textColorHint="#000000" />
+            <!--android:drawableStart="@drawable/ic_lock_white_24dp"-->
 
             <Button
-                android:id="@+id/lgnbtn"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="10dp"
-                android:layout_marginTop="10dp"
-                android:layout_marginRight="10dp"
-                android:layout_marginBottom="10dp"
-                android:background="@drawable/shapesignup"
-                android:padding="15dp"
+                android:text="Log In"
                 android:shadowColor="@android:color/transparent"
-                android:text="Log In" />
+                android:padding="15dp"
+                android:layout_marginRight="60dp"
+                android:layout_marginLeft="60dp"
+                android:layout_marginBottom="10dp"
+                android:layout_marginTop="50dp"
+                android:id="@+id/lgnbtn"
+                android:background="@drawable/shapesignup"/>
 
 
             <!--            <RelativeLayout-->
@@ -92,25 +96,23 @@
             <!--                android:layout_alignParentBottom="true">-->
 
             <Button
-                android:id="@+id/sgntxt"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="10dp"
-                android:layout_marginTop="20dp"
-                android:layout_marginRight="10dp"
-                android:layout_marginBottom="10dp"
-                android:background="@android:color/transparent"
-                android:padding="15dp"
-                android:shadowColor="@android:color/transparent"
                 android:text="No account yet? Create one"
                 android:textAllCaps="false"
-                android:textColor="#AF0000" />
+                android:id="@+id/sgntxt"
+                android:shadowColor="@android:color/transparent"
+                android:padding="15dp"
+                android:layout_marginRight="10dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginBottom="10dp"
+                android:layout_marginTop="50dp"
+                android:background="@android:color/transparent"
+                android:textColor="#f50233" />
             <!--            </LinearLayout>-->
             <!--            </RelativeLayout>-->
 
         </LinearLayout>
-
-
     </LinearLayout>
 
 

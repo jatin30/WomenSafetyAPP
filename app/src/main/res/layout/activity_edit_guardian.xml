@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:background="@drawable/gradientbackground"
+    android:id="@+id/swip1"
+    android:layout_height="match_parent">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        tools:context=".EditGuardian">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#000000"
+            android:textSize="30sp"
+            android:text="Enter new guradian details"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="200dp"/>
+        <EditText
+            android:id="@+id/guardname"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Guardian's Name"
+            android:textColor="#000000"
+            android:inputType="text"
+            android:textSize="20sp"
+            android:textColorHint="#000000"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="50dp"
+            />
+        <EditText
+            android:id="@+id/guardnumber"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Guardian's Number"
+            android:textColor="#000000"
+            android:textColorHint="#000000"
+            android:textSize="20sp"
+            android:layout_marginTop="30dp"
+            android:layout_marginLeft="20dp"
+            android:inputType="number"
+
+            />
+
+        <Button
+            android:id="@+id/confirm"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="100dp"
+            android:layout_marginTop="50dp"
+            android:layout_marginRight="100dp"
+            android:layout_marginBottom="10dp"
+            android:background="@drawable/shapesignup"
+            android:gravity="center"
+            android:padding="15dp"
+            android:shadowColor="@android:color/transparent"
+            android:text="Update" />
+
+    </LinearLayout>
+</androidx.swiperefreshlayout.widget.SwipeRefreshLayout>

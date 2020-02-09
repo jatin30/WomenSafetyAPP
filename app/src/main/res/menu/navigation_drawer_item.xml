@@ -3,6 +3,7 @@
 
 
     <group android:checkableBehavior="single">
+
         <item
             android:id="@+id/prof"
             android:icon="@drawable/change_grd_vt"
@@ -25,9 +26,9 @@
     <item android:title="Other">
         <menu>
             <item
-                android:id="@+id/feedback"
-                android:icon="@drawable/feedback_vt"
-                android:title="Feedback"/>
+                android:id="@+id/About"
+                android:icon="@drawable/ic_about"
+                android:title="About"/>
 
             <item
                 android:id="@+id/logout"

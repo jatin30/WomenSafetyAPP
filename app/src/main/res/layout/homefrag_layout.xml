@@ -34,7 +34,9 @@
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             android:layout_gravity="bottom"
-            android:layout_marginBottom="70dp"
+            android:layout_marginLeft="60dp"
+            android:layout_marginRight="60dp"
+            android:layout_marginBottom="90dp"
             android:background="#1AD1D6"
             android:text="Stop Sending location"
             android:textColor="#FF3D00" />

@@ -5,7 +5,7 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="130dp"
-    android:background="#FF4530">
+    android:background="#52ebcf">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -26,28 +26,43 @@
                 app:srcCompat="@drawable/ic_person_black_24dp" />
 
             <LinearLayout
+                android:id="@+id/infolinlay"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="bottom|center_vertical"
                 android:layout_marginStart="20dp"
                 android:layout_marginBottom="30dp"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:visibility="visible">
+
+                <TextView
+                    android:id="@+id/textView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
+                    android:paddingStart="10dp"
+                    android:text="User Details"
+                    android:textColor="#FF4530"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/navuser"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="TextView"
-                    android:textColor="#FFFFFF"
-                    android:textSize="14sp" />
+                    android:textColor="#050a09"
+                    android:textSize="14sp"
+                    android:visibility="invisible" />
 
                 <TextView
                     android:id="@+id/navemail"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="TextView"
-                    android:textColor="#FFFFFF"
-                    android:textSize="14sp" />
+                    android:textColor="#050a09"
+                    android:textSize="14sp"
+                    android:visibility="invisible" />
             </LinearLayout>
         </LinearLayout>
     </LinearLayout>
