@@ -1,8 +1,11 @@
-# WomenSaftey
-Women Safety Android Application:
+# RAKSHA | Women Safety Android Application 
+• Developed real-time location tracing application Android Application.
+Implemented Pixel Perfect UI to get the bestresults in different screen sizes.
 
-Realtime SOS Android Application. Designed a Location (GPS + Cellular Network) tracing application by alerting guardians of the User.
+• Integrated Google Maps API, location fetching, bestroute Calculations.
 
-Used Firebase AUTH, Firebase Realtime Database and Firebase functions (deep link) for authentication storing location and creating location tracking links. Developed as a part of two members team.
- 
-Stack used: Java, XML, Android Studio, Firebase, GitHub actions.
+• Connected complete application with realtime firebase database for
+authentication,realtime location updates, profile fetching. Developed as a part
+of two members team.
+
+• Technology Used: Java, XML, Firebase, Android Studio
